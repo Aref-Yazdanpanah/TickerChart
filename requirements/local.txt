@@ -1,0 +1,15 @@
+-r base.txt
+
+# Code quality
+# ------------------------------------------------------------------------------
+flake8==6.1.0  # https://github.com/PyCQA/flake8
+flake8-isort==6.1.0  # https://github.com/gforcada/flake8-isort
+black==23.11.0  # https://github.com/psf/black
+
+
+# LSP
+python-lsp-server==1.12.0
+python-lsp-black==2.0.0
+
+# visual tool
+django-debug-toolbar==4.4.6  # https://github.com/jazzband/django-debug-toolbar
