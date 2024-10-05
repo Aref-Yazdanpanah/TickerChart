@@ -17,8 +17,8 @@ class TickerPriceChangeViewSet(viewsets.ViewSet):
                 interval_days,
             ) = TickerService.parse_input_data(request.data)
 
-            # Dictionary to hold final output
-            output = {}
+            # Dictionary to hold final output for aggregated ticker values
+            total_value_over_time = {}
 
             # Loop through each ticker and calculate the values
             for ticker_name, ticker_quantity in tickers_data.items():
@@ -40,13 +40,26 @@ class TickerPriceChangeViewSet(viewsets.ViewSet):
                     market_data, ticker_quantity, start_time, end_time, interval_days
                 )
 
-                # Append results to output
-                output[ticker_name] = ticker_value_over_time
+                # Aggregate the total ticker value over time intervals
+                for entry in ticker_value_over_time:
+                    interval_start = entry["interval_start"]
+                    ticker_value = entry["ticker_value"]
+
+                    if interval_start not in total_value_over_time:
+                        total_value_over_time[interval_start] = ticker_value
+                    else:
+                        total_value_over_time[interval_start] += ticker_value
+
+            # Prepare the response data
+            response_data = [
+                {"interval_start": interval, "total_value": value}
+                for interval, value in total_value_over_time.items()
+            ]
 
             return Response(
                 {
-                    "message": "Price change data calculated successfully",
-                    "data": output,
+                    "message": "Total price change data calculated successfully",
+                    "data": response_data,
                 },
                 status=status.HTTP_200_OK,
             )

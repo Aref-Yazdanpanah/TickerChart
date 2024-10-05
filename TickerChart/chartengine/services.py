@@ -1,7 +1,6 @@
 from datetime import timedelta
 from decimal import Decimal
 
-from django.db.models import Avg
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -30,31 +29,33 @@ class TickerService:
         market_data, ticker_quantity, start_time, end_time, interval_days
     ):
         current_time = start_time
-        ticker_value_over_time = []
+        total_value_over_time = []
 
         while current_time < end_time:
             next_time = current_time + timedelta(days=interval_days)
 
-            # Calculate average close price in this interval
+            # Get the last close price in this interval
             interval_data = market_data.filter(
                 date__gte=current_time, date__lt=next_time
-            ).aggregate(avg_close=Avg("close"))
-            avg_close_price = interval_data["avg_close"] or Decimal("0")
-            ticker_value = avg_close_price * ticker_quantity
+            ).order_by("date").last()
 
-            ticker_value_over_time.append(
+            last_close_price = interval_data.close if interval_data else Decimal("0")
+            ticker_value = last_close_price * ticker_quantity
+
+            total_value_over_time.append(
                 {"interval_start": current_time, "ticker_value": ticker_value}
             )
 
             current_time = next_time
 
-        return ticker_value_over_time
+        return total_value_over_time
 
     @staticmethod
     def get_ticker_data(ticker_name, start_time, end_time):
         try:
             ticker = Ticker.objects.get(name=ticker_name)
             market_data = MarketData.objects.filter(
+            # market_data = MarketData.objects.select_related('ticker').filter(
                 ticker=ticker, date__gte=start_time, date__lte=end_time
             ).order_by("date")
             return ticker, market_data
