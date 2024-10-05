@@ -4,20 +4,37 @@ services:
     build:
       context: ../..
       dockerfile: ./deployment/local/Dockerfile
+    # networks:
+    #   - mynetwork
+    network_mode: "host"  # Use host network mode
     ports:
       - 8000:8000
     volumes:
       - ../..:/app
     depends_on:
       - db
+    environment:
+      - HTTP_PROXY=http://127.0.0.1:8889/
+      - HTTPS_PROXY=http://127.0.0.1:8889/
 
   db:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - ../../.env
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+
+    # env_file:
+    #   - ../../.env
+    network_mode: "host"
+    # networks:
+    #   - mynetwork
 
 volumes:
   postgres_data: {}
 
+# networks:
+#   mynetwork:
+#     driver: bridge
