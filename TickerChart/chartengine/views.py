@@ -17,14 +17,29 @@ class TickerPriceChangeViewSet(viewsets.ViewSet):
                 interval_days,
             ) = TickerService.parse_input_data(request.data)
 
-            # Dictionary to hold final output for aggregated ticker values
-            total_value_over_time = {}
+            # Get ticker names and corresponding IDs
+            ticker_names = list(tickers_data.keys())
+            tickers = TickerService.get_tickers_data(ticker_names)
+            ticker_ids = [ticker.id for ticker in tickers.values()]
+
+            # Dictionary to hold final output
+            output = {}
+
+            # Fetch all market data for the relevant tickers in one query
+            market_data = TickerService.get_market_data(
+                ticker_ids, start_time, end_time
+            )
+
+            # Group market data by ticker ID for processing
+            grouped_market_data = {}
+            for md in market_data:
+                if md.ticker_id not in grouped_market_data:
+                    grouped_market_data[md.ticker_id] = []
+                grouped_market_data[md.ticker_id].append(md)
 
             # Loop through each ticker and calculate the values
             for ticker_name, ticker_quantity in tickers_data.items():
-                ticker, market_data = TickerService.get_ticker_data(
-                    ticker_name, start_time, end_time
-                )
+                ticker = tickers.get(ticker_name)
 
                 if not ticker:
                     return Response(
@@ -35,31 +50,25 @@ class TickerPriceChangeViewSet(viewsets.ViewSet):
                 # Convert ticker_quantity to Decimal
                 ticker_quantity = Decimal(str(ticker_quantity))
 
+                # Get the market data for the ticker
+                ticker_market_data = grouped_market_data.get(ticker.id, [])
+
                 # Calculate the ticker value over time
                 ticker_value_over_time = TickerService.calculate_ticker_value(
-                    market_data, ticker_quantity, start_time, end_time, interval_days
+                    ticker_market_data,
+                    ticker_quantity,
+                    start_time,
+                    end_time,
+                    interval_days,
                 )
 
-                # Aggregate the total ticker value over time intervals
-                for entry in ticker_value_over_time:
-                    interval_start = entry["interval_start"]
-                    ticker_value = entry["ticker_value"]
-
-                    if interval_start not in total_value_over_time:
-                        total_value_over_time[interval_start] = ticker_value
-                    else:
-                        total_value_over_time[interval_start] += ticker_value
-
-            # Prepare the response data
-            response_data = [
-                {"interval_start": interval, "total_value": value}
-                for interval, value in total_value_over_time.items()
-            ]
+                # Append results to output
+                output[ticker_name] = ticker_value_over_time
 
             return Response(
                 {
-                    "message": "Total price change data calculated successfully",
-                    "data": response_data,
+                    "message": "Price change data calculated successfully",
+                    "data": output,
                 },
                 status=status.HTTP_200_OK,
             )

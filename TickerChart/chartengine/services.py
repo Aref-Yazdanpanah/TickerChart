@@ -31,33 +31,37 @@ class TickerService:
         current_time = start_time
         total_value_over_time = []
 
+        # Group market data into a dictionary based on the intervals
+        interval_data_dict = {}
         while current_time < end_time:
             next_time = current_time + timedelta(days=interval_days)
-
-            # Get the last close price in this interval
-            interval_data = market_data.filter(
-                date__gte=current_time, date__lt=next_time
-            ).order_by("date").last()
-
-            last_close_price = interval_data.close if interval_data else Decimal("0")
-            ticker_value = last_close_price * ticker_quantity
-
-            total_value_over_time.append(
-                {"interval_start": current_time, "ticker_value": ticker_value}
-            )
-
+            interval_data_dict[current_time] = [
+                md for md in market_data if current_time <= md.date < next_time
+            ]
             current_time = next_time
+
+        # Iterate over the grouped intervals and calculate the value based on the last close price
+        for interval_start, data_in_interval in interval_data_dict.items():
+            if data_in_interval:
+                last_close_price = data_in_interval[-1].close
+            else:
+                last_close_price = Decimal("0")
+            ticker_value = last_close_price * ticker_quantity
+            total_value_over_time.append(
+                {"interval_start": interval_start, "ticker_value": ticker_value}
+            )
 
         return total_value_over_time
 
     @staticmethod
-    def get_ticker_data(ticker_name, start_time, end_time):
-        try:
-            ticker = Ticker.objects.get(name=ticker_name)
-            market_data = MarketData.objects.filter(
-            # market_data = MarketData.objects.select_related('ticker').filter(
-                ticker=ticker, date__gte=start_time, date__lte=end_time
-            ).order_by("date")
-            return ticker, market_data
-        except Ticker.DoesNotExist:
-            return None, None
+    def get_tickers_data(ticker_names):
+        # Fetch all tickers in one query
+        tickers = Ticker.objects.filter(name__in=ticker_names)
+        return {ticker.name: ticker for ticker in tickers}
+
+    @staticmethod
+    def get_market_data(ticker_ids, start_time, end_time):
+        # Fetch all market data for the specified ticker IDs in one query
+        return MarketData.objects.filter(
+            ticker_id__in=ticker_ids, date__gte=start_time, date__lte=end_time
+        ).order_by("ticker_id", "date")
