@@ -1,15 +1,17 @@
 from decimal import Decimal
 
-from rest_framework import status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
 
 from .models import Ticker
 from .pagination import TickerPagination
+from .schemas import average_daily_prices, ticker_price_change, tickers_list
 from .serializers import TickerSerializer
 from .services import TickerService
 
 
 class TickerPriceChangeViewSet(viewsets.ViewSet):
+    @ticker_price_change
     def create(self, request):
         try:
             # Extract and parse input data
@@ -88,6 +90,7 @@ class AverageDailyPriceViewSet(viewsets.ViewSet):
     ViewSet to retrieve average daily prices of tickers within a time range.
     """
 
+    @average_daily_prices
     def list(self, request):
         try:
             # Parse request data
@@ -127,7 +130,8 @@ class AverageDailyPriceViewSet(viewsets.ViewSet):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TickerViewSet(viewsets.ModelViewSet):
+@tickers_list
+class TickerListView(generics.ListAPIView):
     queryset = Ticker.objects.all()
     serializer_class = TickerSerializer
     pagination_class = TickerPagination

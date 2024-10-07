@@ -3,8 +3,8 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     AverageDailyPriceViewSet,
+    TickerListView,
     TickerPriceChangeViewSet,
-    TickerViewSet,
 )
 
 router = DefaultRouter()
@@ -14,10 +14,10 @@ router.register(
 router.register(
     r"average-daily-prices", AverageDailyPriceViewSet, basename="average-daily-prices"
 )
-router.register(r"tickers", TickerViewSet, basename="tickers")
 
 
 app_name = "chartengine"
 urlpatterns = [
     path("", include(router.urls)),
+    path("tickers/", TickerListView.as_view(), name="tickers-list"),
 ]

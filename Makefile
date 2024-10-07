@@ -67,3 +67,8 @@ rebuild-web-img:
 show-net-conf:
 >	docker-compose -f $(LOCAL_DOCKER_COMPOSE) -p $(PROJECT_NAME) ps  | head -n 2 | tail -n 1 | awk '{printf $$1}' | xargs docker inspect | jq '.[].NetworkSettings.Networks'
 .PHONY: show-net-conf
+
+
+test:
+>	docker-compose -f $(LOCAL_DOCKER_COMPOSE) -p $(PROJECT_NAME) exec web sh -c 'cd TickerChart && python manage.py test'
+.PHONY: test
