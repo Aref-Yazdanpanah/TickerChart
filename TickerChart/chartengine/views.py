@@ -3,6 +3,9 @@ from decimal import Decimal
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
+from .models import Ticker
+from .pagination import TickerPagination
+from .serializers import TickerSerializer
 from .services import TickerService
 
 
@@ -78,3 +81,53 @@ class TickerPriceChangeViewSet(viewsets.ViewSet):
                 {"message": "Error processing data", "error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class AverageDailyPriceViewSet(viewsets.ViewSet):
+    """
+    ViewSet to retrieve average daily prices of tickers within a time range.
+    """
+
+    def list(self, request):
+        try:
+            # Parse request data
+            tickers_data, start_time, end_time, _ = TickerService.parse_input_data(
+                request.data
+            )
+
+            # Get the tickers data from the request
+            tickers = TickerService.get_tickers_data(tickers_data)
+            if not tickers:
+                return Response(
+                    {"detail": "No tickers found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            # Get market data for the tickers within the specified time range
+            ticker_ids = [ticker.id for ticker in tickers.values()]
+            market_data = TickerService.get_market_data(
+                ticker_ids, start_time, end_time
+            )
+
+            # Calculate average daily prices
+            avg_daily_prices = TickerService.calculate_average_daily_prices(market_data)
+
+            # Prepare response data
+            response_data = [
+                {
+                    "ticker_name": record["ticker__name"],
+                    "day": record["day"],
+                    "average_price": record["avg_price"],
+                }
+                for record in avg_daily_prices
+            ]
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TickerViewSet(viewsets.ModelViewSet):
+    queryset = Ticker.objects.all()
+    serializer_class = TickerSerializer
+    pagination_class = TickerPagination

@@ -1,6 +1,8 @@
 from datetime import timedelta
 from decimal import Decimal
 
+from django.db import models
+from django.db.models import Avg
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -65,3 +67,16 @@ class TickerService:
         return MarketData.objects.filter(
             ticker_id__in=ticker_ids, date__gte=start_time, date__lte=end_time
         ).order_by("ticker_id", "date")
+
+    @staticmethod
+    def calculate_average_daily_prices(market_data):
+        """
+        Calculate average daily prices for the provided market data.
+        """
+        daily_averages = (
+            market_data.annotate(day=models.functions.TruncDay("date"))
+            .values("ticker__name", "day")
+            .annotate(avg_price=Avg("close"))
+            .order_by("ticker__name", "day")
+        )
+        return daily_averages
