@@ -109,9 +109,15 @@ When you set POSTGRES_HOST to 127.0.0.1, you're telling Django to connect to the
 To access detailed information about the endpoints in the project, you can utilize the Swagger or Redoc endpoints. Both of these endpoints are included in the project and offer interactive documentation for the API.
 
 
-Swagger endpoint: /schema/swagger-ui/
+Swagger endpoint:
+   ```bash
+   schema/swagger-ui/
+   ```
 
-Redoc endpoint: schema/redoc/
+Redoc endpoint:
+   ```bash
+   schema/redoc/
+   ```
 
 
 ## Libraries
