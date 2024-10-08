@@ -31,8 +31,9 @@ class TickerListViewTests(APITestCase):
 
 class TickerPriceChangeViewSetTests(APITestCase):
     def setUp(self):
-        self.ticker1 = Ticker.objects.create(name="BTCUSDT")
-        self.ticker2 = Ticker.objects.create(name="ETHUSDT")
+        # Create test tickers
+        self.ticker1 = Ticker.objects.create(name="Bitcoin")
+        self.ticker2 = Ticker.objects.create(name="Ethereum")
 
         # Create test market data with aware datetime
         MarketData.objects.create(
@@ -47,13 +48,14 @@ class TickerPriceChangeViewSetTests(APITestCase):
         )
 
     def test_create_price_change_success(self):
+        # Define the URL for the view
         url = reverse("chartengine:ticker-price-change-list")
 
         # Sample request data
         request_data = {
             "tickers": {
-                "BTCUSDT": 1,
-                "ETHUSDT": 2,
+                "Bitcoin": 1,
+                "Ethereum": 2,
             },
             "start_time": "2024-10-01T00:00:00Z",
             "end_time": "2024-10-02T00:00:00Z",
@@ -74,10 +76,11 @@ class TickerPriceChangeViewSetTests(APITestCase):
         self.assertEqual(
             response.data["message"], "Price change data calculated successfully"
         )
-        self.assertIn("BTCUSDT", response.data["data"])
-        self.assertIn("ETHUSDT", response.data["data"])
+        self.assertIn("Bitcoin", response.data["data"])
+        self.assertIn("Ethereum", response.data["data"])
 
     def test_create_price_change_ticker_not_found(self):
+        # Define the URL for the view
         url = reverse("chartengine:ticker-price-change-list")
 
         # Sample request data with a non-existent ticker
@@ -90,6 +93,7 @@ class TickerPriceChangeViewSetTests(APITestCase):
             "interval_time": "1 days",
         }
 
+        # Make the POST request
         response = self.client.post(url, request_data, format="json")
 
         # Check the response status code

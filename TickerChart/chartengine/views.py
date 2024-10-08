@@ -12,7 +12,7 @@ from .services import TickerService
 
 class TickerPriceChangeViewSet(viewsets.ViewSet):
     @ticker_price_change
-    def list(self, request):
+    def create(self, request):
         try:
             # Extract and parse input data
             (
@@ -21,7 +21,6 @@ class TickerPriceChangeViewSet(viewsets.ViewSet):
                 end_time,
                 interval_days,
             ) = TickerService.parse_input_data(request.data)
-
             # Get ticker names and corresponding IDs
             ticker_names = list(tickers_data.keys())
             tickers = TickerService.get_tickers_data(ticker_names)
