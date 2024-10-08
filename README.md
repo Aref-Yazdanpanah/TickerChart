@@ -92,6 +92,7 @@ services:
     # Add any other necessary configurations for the database service
 ```
 
+2. **Modify the .env POSTGRES_HOST**
 Then replace POSTGRES_HOST in the .env file with the following text.
 When you set POSTGRES_HOST to 127.0.0.1, you're telling Django to connect to the PostgreSQL database that is expected to be running on the same host as the Django application. However, since you're using Docker with network_mode: 'host', both containers share the host's network stack, allowing them to communicate directly using localhost.
 
