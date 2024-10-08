@@ -66,6 +66,21 @@ After running the command, the project should be up and running. You can verify 
    ```
 
 
+## Performance Optimization
+
+To optimize code and reduce the number of database queries, the following approach is recommended when fetching market data:
+
+### Batch Fetching and Grouping Market Data
+
+1. **Batch Fetch Market Data**:
+   All market data for the specified ticker between `start_time` and `end_time` should be retrieved in a single query. This approach reduces the number of queries to just one for all market data within the specified date range.
+
+2. **Group by Intervals**:
+   After fetching the data, the results can be manually grouped in memory by the specified intervals. From this grouped data, the last close price for each interval can be extracted.
+
+By implementing this strategy, significant improvements in the performance of the application can be achieved while minimizing the load on the database.
+
+
 ## Retrieving Data from Binance
 
 To retrieve market data from Binance, the project includes a management command that fetches data from the Binance API. However, since Binance may have regional restrictions or filtering mechanisms, the Docker container must be configured to bypass these restrictions using a local proxy.
