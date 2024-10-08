@@ -10,7 +10,6 @@ from TickerChart.chartengine.models import MarketData, Ticker
 
 class TickerListViewTests(APITestCase):
     def setUp(self):
-        # Create sample tickers for testing
         Ticker.objects.create(name="Bitcoin")
         Ticker.objects.create(name="Ethereum")
 
@@ -18,22 +17,20 @@ class TickerListViewTests(APITestCase):
         # Define the URL for the ticker list view
         url = reverse(
             "chartengine:tickers-list"
-        )  # Use the correct namespace for your URL
+        )
 
-        # Send a GET request to the URL
         response = self.client.get(url)
 
         # Check the response status code
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Verify the response data
-        self.assertEqual(len(response.data["results"]), 2)  # Expecting 2 tickers
+        self.assertEqual(len(response.data["results"]), 2)
         self.assertEqual(response.data["results"][0]["name"], "Bitcoin")
         self.assertEqual(response.data["results"][1]["name"], "Ethereum")
 
 
 class TickerPriceChangeViewSetTests(APITestCase):
     def setUp(self):
-        # Create test tickers
         self.ticker1 = Ticker.objects.create(name="Bitcoin")
         self.ticker2 = Ticker.objects.create(name="Ethereum")
 
@@ -50,7 +47,6 @@ class TickerPriceChangeViewSetTests(APITestCase):
         )
 
     def test_create_price_change_success(self):
-        # Define the URL for the view
         url = reverse("chartengine:ticker-price-change-list")
 
         # Sample request data
@@ -82,7 +78,6 @@ class TickerPriceChangeViewSetTests(APITestCase):
         self.assertIn("Ethereum", response.data["data"])
 
     def test_create_price_change_ticker_not_found(self):
-        # Define the URL for the view
         url = reverse("chartengine:ticker-price-change-list")
 
         # Sample request data with a non-existent ticker
@@ -95,7 +90,6 @@ class TickerPriceChangeViewSetTests(APITestCase):
             "interval_time": "1 days",
         }
 
-        # Make the POST request
         response = self.client.post(url, request_data, format="json")
 
         # Check the response status code

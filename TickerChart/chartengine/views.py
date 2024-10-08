@@ -12,7 +12,7 @@ from .services import TickerService
 
 class TickerPriceChangeViewSet(viewsets.ViewSet):
     @ticker_price_change
-    def create(self, request):
+    def list(self, request):
         try:
             # Extract and parse input data
             (
