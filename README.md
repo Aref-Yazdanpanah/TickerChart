@@ -12,16 +12,19 @@ This project allows users to track and analyze the price movements of various ti
 - The list of 541 tickers and the market data is retrieved from the Binance API.
 - Market data is fetched with a 15-minute time frame starting from January 1, 2023, to October 1, 2024.
 
-
-## How to Use
+## Installation
 
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/Aref-Yazdanpanah/TickerChart.git
    cd TickerChart
-   touch .env
 
-2. **Copy the following text into the .env file**:
+2. **Create the Environment File**:
+   ````bash
+   touch .env
+   ```
+
+3. **Copy the following text into the .env file**:
    ```bash
    SECRET_KEY='django-insecure-wtartsm--^c24k0mu@*7vxtfnk=qx(d(=ac=9#=d%z)b0xl$z#'
    DEBUG=True
@@ -43,29 +46,29 @@ To execute the project using Docker, follow these steps:
 
    Make sure Docker is installed and running on your system. You can verify this by running the following command:
 
-```bash
-docker --version
-```
+   ```bash
+   docker --version
+   ```
    
 2. **Ensure Docker Compose is Installed**
 
 3. **Run the Project Using Make**:
-```bash
-make local-stack-up
-```
+   ```bash
+   make local-stack-up
+   ```
 
 4. **Verify the Project is Running**:
 After running the command, the project should be up and running. You can verify by visiting http://localhost:8000 in your web browser. If you are using a different port or host configuration, adjust accordingly.
 
 5. **Stopping the Project**:
-```bash
-make local-stack-down
-```
+   ```bash
+   make local-stack-down
+   ```
 
 
 ## Retrieving Data from Binance
 
-To retrieve market data from Binance, the project includes a management command that fetches data from the Binance API. However, since Binance may have regional restrictions or filtering mechanisms, the Docker container running the project must be configured to bypass these restrictions using a local proxy.
+To retrieve market data from Binance, the project includes a management command that fetches data from the Binance API. However, since Binance may have regional restrictions or filtering mechanisms, the Docker container must be configured to bypass these restrictions using a local proxy.
 
 ### Proxy Configuration for Binance API Access
 
@@ -81,21 +84,64 @@ In order to proxy the container to bypass the Binance filter and retrieve data s
 
 ```yaml
 services:
-  web:
-    build: .
-    network_mode: "host"
-    # Add any other necessary configurations for the web service
+   web:
+      build: .
+      network_mode: "host"
 
-  db:
-    build: .
-    network_mode: "host"
-    # Add any other necessary configurations for the database service
+
+   db:
+      build: .
+      network_mode: "host"
+
 ```
 
 2. **Modify the .env POSTGRES_HOST**
-Then replace POSTGRES_HOST in the .env file with the following text.
+Then replace POSTGRES_HOST in the .env file with the following text:
+   ```bash
+   POSTGRES_HOST=127.0.0.1
+   ```
+
 When you set POSTGRES_HOST to 127.0.0.1, you're telling Django to connect to the PostgreSQL database that is expected to be running on the same host as the Django application. However, since you're using Docker with network_mode: 'host', both containers share the host's network stack, allowing them to communicate directly using localhost.
 
-```bash
-POSTGRES_HOST=127.0.0.1
-```
+
+## Endpoints
+
+To access detailed information about the endpoints in the project, you can utilize the Swagger or Redoc endpoints. Both of these endpoints are included in the project and offer interactive documentation for the API.
+
+
+Swagger endpoint: /schema/swagger-ui/
+
+Redoc endpoint: schema/redoc/
+
+
+## Libraries
+
+[**django-debug-toolbar**](https://django-debug-toolbar.readthedocs.io/en/latest/)
+
+"The Django Debug Toolbar is a configurable set of panels that display various debug information about the current request/response and when clicked, display more details about the panel's content."
+
+
+## Testing
+To ensure that the TickerChart project is functioning correctly, you can run the test suite provided.
+
+### Running Tests
+
+1. **Run Tests with Docker**:
+   You can run the tests in the Docker environment using the following command:
+
+   ```bash
+   make test
+
+### This command will execute the Django test suite inside the Docker container. The output will be similar to:
+   ```bash
+   Found 3 test(s).
+   Creating test database for alias 'default'...
+   System check identified no issues (0 silenced).
+   /usr/local/lib/python3.11/site-packages/rest_framework/pagination.py:207: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'TickerChart.chartengine.models.Ticker'> QuerySet.
+   ...
+   ----------------------------------------------------------------------
+   Ran 3 tests in 0.031s
+
+   OK
+   Destroying test database for alias 'default'...
+   ```
