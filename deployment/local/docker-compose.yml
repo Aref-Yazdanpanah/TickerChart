@@ -4,9 +4,7 @@ services:
     build:
       context: ../..
       dockerfile: ./deployment/local/Dockerfile
-    # networks:
-    #   - mynetwork
-    network_mode: "host"  # Use host network mode
+    network_mode: "host"
     ports:
       - 8000:8000
     volumes:
@@ -25,16 +23,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
-
-    # env_file:
-    #   - ../../.env
     network_mode: "host"
-    # networks:
-    #   - mynetwork
 
 volumes:
   postgres_data: {}
-
-# networks:
-#   mynetwork:
-#     driver: bridge

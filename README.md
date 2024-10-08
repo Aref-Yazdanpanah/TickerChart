@@ -12,16 +12,91 @@ This project allows users to track and analyze the price movements of various ti
 - The list of 541 tickers and the market data is retrieved from the Binance API.
 - Market data is fetched with a 15-minute time frame starting from January 1, 2023, to October 1, 2024.
 
-### Docker Setup
-To run the application, we use Docker. Ensure that the network mode is properly configured to proxy the web container to the host system to fetch data from the Binance API.
 
-### Prerequisites
+## How to Use
 
-- Docker and Docker Compose installed on your machine.
-- The network configuration should allow local proxying, so make sure the following is set in your `docker-compose.yml`:
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/Aref-Yazdanpanah/TickerChart.git
+   cd TickerChart
+
+
+2. **Install the virtual environment**:
+   Install a virtual environment:
+   ```bash
+   python3 -m venv venv
+   ```
+
+
+3. **Activate the virtual environment:**  
+   For Linux/Mac:
+   ```bash
+   source venv/bin/activate
+   ```
+
+    For Windows:
+    ```bash
+    venv\Scripts\activate
+    ```
+
+4. **Install the required dependencies**:
+```bash
+pip install -r requirements/local.txt
+```
+
+
+## Running the Project with Docker
+
+To execute the project using Docker, follow these steps:
+
+1. **Ensure Docker is Installed**
+
+   Make sure Docker is installed and running on your system. You can verify this by running the following command:
+
+```bash
+docker --version
+```
+   
+2. **Ensure Docker Compose is Installed**
+
+3. **Run the Project Using Make**:
+```bash
+make local-stack-up
+```
+
+4. **Verify the Project is Running**:
+After running the command, the project should be up and running. You can verify by visiting http://localhost:8000 in your web browser. If you are using a different port or host configuration, adjust accordingly.
+
+5. **Stopping the Project**:
+```bash
+make local-stack-down
+```
+
+
+## Retrieving Data from Binance
+
+To retrieve market data from Binance, the project includes a management command that fetches data from the Binance API. However, since Binance may have regional restrictions or filtering mechanisms, the Docker container running the project must be configured to bypass these restrictions using a local proxy.
+
+### Proxy Configuration for Binance API Access
+
+In order to proxy the container to bypass the Binance filter and retrieve data successfully, you need to modify the Docker network configuration. This allows the container to use the local system's network, ensuring that it can communicate with Binance.
+
+### Steps to Configure Docker for Binance API Access
+
+1. **Modify the Docker Compose Network Mode**
+
+   The Docker container running the project must be proxied to the local system. To achieve this, you need to configure the `network_mode` for the `web` service and `db` service in the `docker-compose.yml` file.
+
+   Open your `docker-compose.yml` file and ensure the following configuration is applied:
 
 ```yaml
 services:
   web:
     build: .
     network_mode: "host"
+    # Add any other necessary configurations for the web service
+
+  db:
+    build: .
+    network_mode: "host"
+    # Add any other necessary configurations for the database service

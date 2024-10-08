@@ -7,7 +7,7 @@ from .base import env
 DEBUG = False
 
 # # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-# ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["erebor.tech"])
+# ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["..."])
 
 
 # # SECURITY

@@ -3,7 +3,7 @@ FROM python:3.11-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE merovingian.configs.production
+ENV DJANGO_SETTINGS_MODULE TickerChart.settings.production
 # Install the project dependencies
 RUN pip install --upgrade pip
 RUN apt-get -o Acquire::Check-Valid-Until="false" update && apt-get install -y libpq-dev
