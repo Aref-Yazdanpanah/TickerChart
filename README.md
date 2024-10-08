@@ -19,30 +19,20 @@ This project allows users to track and analyze the price movements of various ti
    ```bash
    git clone https://github.com/Aref-Yazdanpanah/TickerChart.git
    cd TickerChart
+   touch .env
 
-
-2. **Install the virtual environment**:
-   Install a virtual environment:
+2. **Copy the following text into the .env file**:
    ```bash
-   python3 -m venv venv
+   SECRET_KEY='django-insecure-wtartsm--^c24k0mu@*7vxtfnk=qx(d(=ac=9#=d%z)b0xl$z#'
+   DEBUG=True
+
+
+   POSTGRES_DB=postgres
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=postgres
+   POSTGRES_HOST=db
+   POSTGRES_PORT=5432
    ```
-
-
-3. **Activate the virtual environment:**  
-   For Linux/Mac:
-   ```bash
-   source venv/bin/activate
-   ```
-
-    For Windows:
-    ```bash
-    venv\Scripts\activate
-    ```
-
-4. **Install the required dependencies**:
-```bash
-pip install -r requirements/local.txt
-```
 
 
 ## Running the Project with Docker
@@ -100,3 +90,11 @@ services:
     build: .
     network_mode: "host"
     # Add any other necessary configurations for the database service
+```
+
+Then replace POSTGRES_HOST in the .env file with the following text.
+When you set POSTGRES_HOST to 127.0.0.1, you're telling Django to connect to the PostgreSQL database that is expected to be running on the same host as the Django application. However, since you're using Docker with network_mode: 'host', both containers share the host's network stack, allowing them to communicate directly using localhost.
+
+```bash
+POSTGRES_HOST=127.0.0.1
+```

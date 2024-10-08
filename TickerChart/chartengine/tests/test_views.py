@@ -10,8 +10,8 @@ from TickerChart.chartengine.models import MarketData, Ticker
 
 class TickerListViewTests(APITestCase):
     def setUp(self):
-        Ticker.objects.create(name="Bitcoin")
-        Ticker.objects.create(name="Ethereum")
+        Ticker.objects.create(name="BTCUSDT")
+        Ticker.objects.create(name="ETHUSDT")
 
     def test_list_tickers(self):
         # Define the URL for the ticker list view
@@ -25,14 +25,14 @@ class TickerListViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Verify the response data
         self.assertEqual(len(response.data["results"]), 2)
-        self.assertEqual(response.data["results"][0]["name"], "Bitcoin")
-        self.assertEqual(response.data["results"][1]["name"], "Ethereum")
+        self.assertEqual(response.data["results"][0]["name"], "BTCUSDT")
+        self.assertEqual(response.data["results"][1]["name"], "ETHUSDT")
 
 
 class TickerPriceChangeViewSetTests(APITestCase):
     def setUp(self):
-        self.ticker1 = Ticker.objects.create(name="Bitcoin")
-        self.ticker2 = Ticker.objects.create(name="Ethereum")
+        self.ticker1 = Ticker.objects.create(name="BTCUSDT")
+        self.ticker2 = Ticker.objects.create(name="ETHUSDT")
 
         # Create test market data with aware datetime
         MarketData.objects.create(
@@ -52,8 +52,8 @@ class TickerPriceChangeViewSetTests(APITestCase):
         # Sample request data
         request_data = {
             "tickers": {
-                "Bitcoin": 1,
-                "Ethereum": 2,
+                "BTCUSDT": 1,
+                "ETHUSDT": 2,
             },
             "start_time": "2024-10-01T00:00:00Z",
             "end_time": "2024-10-02T00:00:00Z",
@@ -74,8 +74,8 @@ class TickerPriceChangeViewSetTests(APITestCase):
         self.assertEqual(
             response.data["message"], "Price change data calculated successfully"
         )
-        self.assertIn("Bitcoin", response.data["data"])
-        self.assertIn("Ethereum", response.data["data"])
+        self.assertIn("BTCUSDT", response.data["data"])
+        self.assertIn("ETHUSDT", response.data["data"])
 
     def test_create_price_change_ticker_not_found(self):
         url = reverse("chartengine:ticker-price-change-list")
