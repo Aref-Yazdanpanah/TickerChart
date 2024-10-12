@@ -57,9 +57,9 @@ To execute the project using Docker, follow these steps:
    make local-stack-up
    ```
 
-**Handling Startup Errors**:
+## Handling Startup Errors:
 If you encounter the following error:
-   ## ERROR: No container found for web_1
+   **ERROR: No container found for web_1**
 This typically means that the web container started before the database container was ready. Since the web container depends on the database container, the project will not run correctly until both are ready.
 
 ## Solution:
@@ -68,6 +68,7 @@ To fix this issue, restart the web container by running the following command:
    make r
    ```
 
+
 4. **Verify the Project is Running**:
 After running the command, the project should be up and running. You can verify by visiting http://localhost:8000 in your web browser. If you are using a different port or host configuration, adjust accordingly.
 
@@ -75,6 +76,7 @@ After running the command, the project should be up and running. You can verify 
    ```bash
    make local-stack-down
    ```
+
 
 
 ## Performance Optimization
@@ -92,6 +94,7 @@ To optimize code and reduce the number of database queries, the following approa
 By implementing this strategy, significant improvements in the performance of the application can be achieved while minimizing the load on the database.
 
 
+
 ## Retrieving Data from Binance
 
 To retrieve market data from Binance, the project includes a management command that fetches data from the Binance API. However, since Binance may have regional restrictions or filtering mechanisms, the Docker container must be configured to bypass these restrictions using a local proxy.
@@ -102,36 +105,36 @@ In order to proxy the container to bypass the Binance filter and retrieve data s
 
 ### Steps to Configure Docker for Binance API Access
 
-1. **Modify the Docker Compose Network Mode**
+1. **Modify the Docker Compose Network Mode**:
 
    The Docker container running the project must be proxied to the local system. To achieve this, you need to configure the `network_mode` for the `web` service and `db` service in the `docker-compose.yml` file.
 
    Open your `docker-compose.yml` file and ensure the following configuration is applied:
 
-```yaml
-services:
-   web:
-      build: .
-      network_mode: "host"
+   ```yaml
+   services:
+      web:
+         build: .
+         network_mode: "host"
 
 
-   db:
-      build: .
-      network_mode: "host"
+      db:
+         build: .
+         network_mode: "host"
 
-```
+   ```
 
-2. **Modify the .env POSTGRES_HOST**
+2. **Modify the .env POSTGRES_HOST**:
 Then replace POSTGRES_HOST in the .env file with the following text:
    ```bash
    POSTGRES_HOST=127.0.0.1
    ```
 
-When you set POSTGRES_HOST to 127.0.0.1, you're telling Django to connect to the PostgreSQL database that is expected to be running on the same host as the Django application. However, since you're using Docker with network_mode: 'host', both containers share the host's network stack, allowing them to communicate directly using localhost.
+   When you set POSTGRES_HOST to 127.0.0.1, you're telling Django to connect to the PostgreSQL database that is expected to be running on the same host as the Django application. However, since you're using Docker with network_mode: 'host', both containers share the host's network stack, allowing them to communicate directly using localhost.
 
 
-3. **Running Management Commands in the Web Container**
-To interact with the project via the Django management commands within the Docker container, follow these steps:
+3. **Running Management Commands in the Web Container**:
+   To interact with the project via the Django management commands within the Docker container, follow these steps:
 
    A. **Access the Web Container Shell**
    Run the following command to open an interactive shell (bash) inside the web container:
