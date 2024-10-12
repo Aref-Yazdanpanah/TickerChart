@@ -22,7 +22,7 @@ This project allows users to track and analyze the price movements of various ti
 2. **Create the Environment File**:
    ````bash
    touch .env
-   ```
+
 
 3. **Copy the following text into the .env file**:
    ```bash
@@ -55,6 +55,17 @@ To execute the project using Docker, follow these steps:
 3. **Run the Project Using Make**:
    ```bash
    make local-stack-up
+   ```
+
+**Handling Startup Errors**:
+If you encounter the following error:
+   ## ERROR: No container found for web_1
+This typically means that the web container started before the database container was ready. Since the web container depends on the database container, the project will not run correctly until both are ready.
+
+## Solution:
+To fix this issue, restart the web container by running the following command:
+   ```bash
+   make r
    ```
 
 4. **Verify the Project is Running**:
@@ -117,6 +128,60 @@ Then replace POSTGRES_HOST in the .env file with the following text:
    ```
 
 When you set POSTGRES_HOST to 127.0.0.1, you're telling Django to connect to the PostgreSQL database that is expected to be running on the same host as the Django application. However, since you're using Docker with network_mode: 'host', both containers share the host's network stack, allowing them to communicate directly using localhost.
+
+
+3. **Running Management Commands in the Web Container**
+To interact with the project via the Django management commands within the Docker container, follow these steps:
+
+   A. **Access the Web Container Shell**
+   Run the following command to open an interactive shell (bash) inside the web container:
+      ```bash
+      make bash
+      ```
+
+   B. **Navigate to the Project Directory**
+   After entering the web container, navigate to the TickerChart directory by running:
+      ```bash
+      cd TickerChart/
+      ```
+
+   C. **Fetch Tickers from Binance API**
+   To access the Binance API through a local proxy (such as an HTTP or SOCKS proxy), ensure that the proxy server is running on your local machine. Then, use the HTTPS_PROXY environment variable to route the request through the proxy.
+
+   Example using HTTP proxy (if your proxy server is running at 127.0.0.1:8889):
+      ```bash
+      HTTPS_PROXY=http://127.0.0.1:8889/ python manage.py fetch_all_symbols
+      ```
+
+   Example using SOCKS proxy (if your SOCKS proxy server is running at 127.0.0.1:1080):
+      ```bash
+      HTTPS_PROXY=socks5://127.0.0.1:1080/ python manage.py fetch_all_symbols
+      ```
+
+   These commands route the traffic through the specified proxy (HTTP or SOCKS) to fetch the ticker data from Binance.
+
+   D. **Fetch Market Data from Binance API**
+   Similarly, to fetch historical price data from the Binance API, run the following command:
+
+   For HTTP proxy:
+      ```bash
+      HTTPS_PROXY=http://127.0.0.1:8889/ python manage.py fetch_historical_data
+      ```
+
+   For SOCKS proxy:
+      ```bash
+      HTTPS_PROXY=socks5://127.0.0.1:1080/ python manage.py fetch_historical_data
+      ```
+
+   These commands will retrieve market data from Binance while routing the traffic through the specified proxy.
+
+
+   **Proxy Configuration Explanation**
+   
+   - **HTTP Proxy**:If using an HTTP proxy, set the HTTPS_PROXY environment variable to the HTTP proxy address in the format http://localhost:PORT/.
+
+   - **SOCKS Proxy**:If using a SOCKS proxy, set the HTTPS_PROXY environment variable to the SOCKS proxy address in the format socks5://localhost:PORT/.
+
 
 
 ## Endpoints
